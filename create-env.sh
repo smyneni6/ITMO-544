@@ -7,7 +7,7 @@ echo -ne "Check number of Paramters!Please pass all five parameters in order of 
 else
 aws ec2 run-instances --image-id $1 --key-name $2 --security-group-ids $3 --instance-type t2.micro --count $5 --user-data file://installenv.sh
 echo -ne "---------------instances are launching-------------/n"
-InstanceID1=`aws ec2 describe-instances --query 'Reservations[*].Instances[*].[Placement.AvailabilityZone, State.Name, InstanceId]` --output text | grep us-west-2b | grep pending|awk '{print $3}'`
+InstanceID1=`aws ec2 describe-instances --query 'Reservations[*].Instances[*].[Placement.AvailabilityZone, State.Name, InstanceId] --output text | grep us-west-2b | grep pending|awk '{print $3}'`
 aws ec2 wait instance-running --instance-ids $InstanceID1
 echo -ne "----------------List of instanceId-----------/n"
 InstanceId=`aws ec2 describe-instances --query 'Reservations[*].Instances[].[InstanceId,State.Name]' --output text | grep running|awk '{print $1}'`
