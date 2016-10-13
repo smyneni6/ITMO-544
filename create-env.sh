@@ -3,8 +3,8 @@ echo -ne "hello 544 /n"
 echo -ne "launching instances $1 $2"
 aws ec2 run-instances --image-id $1 --key-name week3 --security-group-ids sg-d36ea2aa --instance-type t2.micro --count $2 --user-data file://installenv.sh
 echo -ne "---------------instances are launching-------------/n"
-aws ec2 wait instance-running --filters "Name=availability-zone,Values=us-west-2b"
-sleep 90
+InstanceID1=`aws ec2 describe-instances --query 'Reservations[*].Instances[*].[Placement.AvailabilityZone, State.Name, InstanceId]`
+aws ec2 wait instance-running --instance-ids $InstanceID1
 echo -ne "----------------List of instanceId-----------/n"
 InstanceId=`aws ec2 describe-instances --query 'Reservations[*].Instances[].[InstanceId,State.Name]' --output text | grep running|awk '{print $1}'`
 echo $InstanceId
