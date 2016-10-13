@@ -1,7 +1,11 @@
 #!/bin/bash
 echo -ne "hello 544 /n"
-echo -ne "launching instances $1 $2"
-aws ec2 run-instances --image-id $1 --key-name week3 --security-group-ids sg-d36ea2aa --instance-type t2.micro --count $2 --user-data file://installenv.sh
+echo -ne "Pass required parameter to create environment"
+params=$#
+if [ $# -ne 5 ] 
+echo -ne "Check number of Paramters!Please pass all five parameters in order of AMI ID, Key-name, Security-Group, Launch-configuration and count"
+else
+aws ec2 run-instances --image-id $1 --key-name $2 --security-group-ids $3 --instance-type t2.micro --count $5 --user-data file://installenv.sh
 echo -ne "---------------instances are launching-------------/n"
 InstanceID1=`aws ec2 describe-instances --query 'Reservations[*].Instances[*].[Placement.AvailabilityZone, State.Name, InstanceId]`
 aws ec2 wait instance-running --instance-ids $InstanceID1
@@ -19,9 +23,9 @@ aws elb register-instances-with-load-balancer --load-balancer-name week4-elb --i
 echo -ne "Instances registered with load balancer/n"
 sleep 5
 echo -ne "Creating launch-configuration : webserver/n"
-aws autoscaling create-launch-configuration --launch-configuration-name webserver --image-id $1 --key-name week3 --instance-type t2.micro --user-data file://installenv.sh
+aws autoscaling create-launch-configuration --launch-configuration-name $4 --image-id $1 --key-name $2 --instance-type t2.micro --user-data file://installenv.sh
 echo -ne "Launch configuration created/n"
 sleep 5
 echo -ne "Creating auto-scaling-group/n"
-aws autoscaling create-auto-scaling-group --auto-scaling-group-name week4 --launch-configuration webserver --availability-zone us-west-2b --load-balancer-names week4-elb --max-size 5 --min-size 2 --desired-capacity 4
+aws autoscaling create-auto-scaling-group --auto-scaling-group-name week4 --launch-configuration $4 --availability-zone us-west-2b --load-balancer-names week4-elb --max-size 5 --min-size 2 --desired-capacity 4
 echo -ne "***Auto-scaling group configured.Completed sucessfully!******** "
